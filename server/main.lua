@@ -75,8 +75,8 @@ end)
 --
 
 
-function create(administrator, balance, number, data)
-    if administrator == nil then
+function create(owner, balance, number, data)
+    if owner == nil then
         return "missingVariables"
     end
 
@@ -101,17 +101,17 @@ function create(administrator, balance, number, data)
     end
 
     MySQL.Async.execute(
-        "INSERT INTO bank_accounts (number, administrator, balance, data) VALUES (@number, @administrator, @balance, @data)",
+        "INSERT INTO bank_accounts (number, owner, balance, data) VALUES (@number, @owner, @balance, @data)",
         {
             ["@number"] = number,
-            ["@administrator"] = json.encode(administrator),
+            ["@owner"] = json.encode(owner),
             ["@balance"] = balance,
             ["@data"] = json.encode(data)
         },
         function()
             accounts[number] = {
                 number = number,
-                founder = administrator,
+                founder = owner,
                 balance = balance,
                 data = data,
                 changed = false
