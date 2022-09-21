@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="cs-CZ">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css" type="text/css">
+</head>
+
+<body>
+    <!-- Wrapper -->
+    <div class="wrapper">
+        <!-- Menu -->
+        <div class="menu">
+            <div class="logo">
+                <img src="logo.png" alt="logo">
+            </div>
+
+            <div class="close">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Accounts -->
+            <div id="accounts">
+                <h1>Účty</h1>
+
+                <button id="new-acc-btn">Nový účet</button>
+                
+                <table id="myaccounts"></table>
+            </div>
+
+            <div id="newaccount">
+                <h1>Založení nového účtu</h1>
+
+                Název účtu:<br>
+                <input type="text" id="new-acc-name" placeholder="Název účtu" autocomplete="off" spellcheck="false" maxlength="50">
+                
+                <br><br>
+
+                <button id="create-acc-submit">Založit účet</button>
+
+                <br>
+
+                <i class="fas fa-chevron-left cancel"></i>
+            </div>
+
+            <div id="editaccount">
+                <h1>Správa účtu - <span id="current-acc-name"></span></h1>
+
+                Název účtu:<br>
+                <input type="text" id="edit-acc-name" placeholder="Název účtu" autocomplete="off" spellcheck="false" maxlength="50">
+
+                <br><br>
+
+                <input type="hidden" id="edit-acc-id">
+                <button id="edit-acc-submit">Uložit změny</button>
+
+                <br>
+
+                <i class="fas fa-chevron-left cancel"></i>
+            </div>
+
+            <div id="deleteaccount">
+                <h1>Zrušení účtu</h1>
+
+                Opravdu chcete zrušit účet <span id="delete-acc-name"></span> ?<br>
+                <input type="text" id="retype-acc-name" placeholder="Opište název účtu" autocomplete="off" spellcheck="false">
+                <input type="hidden" id="retype-acc-confirm">
+                <input type="hidden" id="delete-acc-id">
+
+                <br><br>
+
+                <button id="delete-acc-submit">Potvrdit</button>
+                <button id="delete-acc-cancel">Zrušit</button>
+            </div>
+
+            <div id="account">
+                <div id="account-data"></div>
+                <br>
+                <i class="fas fa-chevron-left cancel"></i>
+            </div>
+        </div>
+    </div>
+    
+    <script src="index.js" type="text/javascript"></script>
+</body>
+</html>

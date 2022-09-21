@@ -1,0 +1,135 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    user-select: none;
+}
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+table th {
+    background-color: #1a1c24;
+    color: #8b8b8b;
+}
+
+table th:first-child {
+    border-radius: 5px 0 0 0;
+}
+
+table th:last-child {
+    border-radius: 0 5px 0 0;
+}
+
+table td {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #8b8b8b;
+}
+
+table th, table td {
+    padding: 8px;
+    text-align: left;
+}
+
+table tr:hover td {
+    color: #017ebc;
+}
+
+input[type='text'],
+input[type='number'],
+select {
+    width: 300px;
+    height: 35px;
+    background-color: #1a1c24;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+    color: #8b8b8b;
+}
+
+input[type='number']:disabled {
+    cursor: not-allowed;
+}
+
+button {
+    background-color: #017ebc;
+    padding: 10px;
+    margin-bottom: 20px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.wrapper {
+    width: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.menu {
+    width: 100%;
+    height: 58px;
+    background-color: #1a1c24;
+    position: relative;
+    border-radius: 5px;
+}
+
+.logo {
+    position: absolute;
+    top: 4px;
+    left: 10px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    line-height: 58px;
+    color: #fff;
+}
+
+.content {
+    margin-top: 20px;
+    color: #fff;
+}
+
+#accounts, #newaccount, #editaccount, #deleteaccount, #account {
+    display: none;
+}
+
+#current-acc-name,
+#delete-acc-name,
+#opened-acc-name {
+    font-style: italic;
+}
+
+.open-account {
+    cursor: pointer;
+}
+
+#toggle-amount, #toggle-account-number {
+    display: none;
+}

@@ -11,8 +11,9 @@ MySQL.ready(function()
             for i=1, #result do
                 accounts[result[i].number] = {
                     number = result[i].number,
-                    administrator = json.decode(result[i].administrator),
+                    owner = json.decode(result[i].owner),
                     balance = result[i].balance,
+                    main = result[i].main,
                     data = json.decode(result[i].data),
                     changed = false
                 }
@@ -26,56 +27,57 @@ MySQL.ready(function()
     SetTimeout(25000, saveAccounts)
 end)
 
+-- check is close, or it will probably could be opened by some random dick fuck (I mean, it will just open his bank account, but why not to ban that prick)
+RegisterNetEvent("fleecabank:open")
+AddEventHandler("fleecabank:open",
+    function()
+        local client = source
+
+        local count, accessedAccounts = getAccountsByOwner(client)
+        TriggerClientEvent("fleecabank:open", client, accessedAccounts, count)
+    end
+)
+
+RegisterNetEvent("fleecabank:paymain")
+AddEventHandler("fleecabank:paymain",
+    function(amount)
+        local client = source
+
+        local done = removeFunds(getMainAccountByOwner(client).number, amount, true)
+        TriggerClientEvent("fleecabank:paymain", client, done, amount)
+    end
+)
 function saveAccounts()
     print("FLEECABANK: CHANGED BANK ACCOUNTS SAVED")
 
     SetTimeout(25000, saveAccounts)
 end
 
--- TESTING (later on will be put in as an admin command, highest/developer rank only)
-RegisterCommand("cba", function(source, args)
-    local client = source
-    create(client, 150, os.time(), {
-        account_created = os.time(),
-        account_name = "NO NAME"
-    })
-end)
-RegisterCommand("rba", function(source, args)
-    local sourceAcc = tonumber(args[1])
+function doesAccountExist(sourceAccount)
+    return (accounts[sourceAccount] ~= nil) and true or false
+end
 
-    local done = delete(sourceAcc)
-
-    print("DELETE ACC", sourceAcc, done)
-end)
-RegisterCommand("check", function(source, args)
-    local val = tonumber(args[1])
-    local sourceAcc = tonumber(args[2])
-
-    local hasValue = checkFunds(sourceAcc, val, false)
-
-    print("CHECK FUNDS", sourceAcc, val, hasValue)
-end)
-RegisterCommand("remove", function(source, args)
-    local val = tonumber(args[1])
-    local sourceAcc = tonumber(args[2])
-
-    local done = removeFunds(sourceAcc, val, true)
-
-    print("REMOVE FUNDS", sourceAcc, val, done)
-end)
-RegisterCommand("transfer", function(source, args)
-    local val = tonumber(args[1])
-    local sourceAcc = tonumber(args[2])
-    local targetAcc = tonumber(args[3])
-
-    local done = transferFunds(sourceAcc, targetAcc, val, true)
-
-    print("TRANSFER FUNDS", sourceAcc, targetAcc, val, done)
-end)
---
-
-
-function create(owner, balance, number, data)
+function getMainAccountByOwner(ownerId)
+    local mainAccount = nil
+    for k,v in pairs(accounts) do
+        if v.owner == ownerId and v.main then
+            mainAccount = v
+        end
+    end
+    return mainAccount
+end
+function getAccountsByOwner(ownerId)
+    local _owned = {}
+    local _count = 0
+    for k,v in pairs(accounts) do
+        if v.owner == ownerId then
+            _owned[k] = v
+            _count = _count + 1
+        end
+    end
+    return _count, _owned
+end
+function create(owner, balance, number, data, main)
     if owner == nil then
         return "missingVariables"
     end
@@ -101,11 +103,12 @@ function create(owner, balance, number, data)
     end
 
     MySQL.Async.execute(
-        "INSERT INTO bank_accounts (number, owner, balance, data) VALUES (@number, @owner, @balance, @data)",
+        "INSERT INTO bank_accounts (number, owner, balance, data) VALUES (@number, @owner, @balance, @main, @data)",
         {
             ["@number"] = number,
             ["@owner"] = json.encode(owner),
             ["@balance"] = balance,
+            ["@main"] = main,
             ["@data"] = json.encode(data)
         },
         function()
@@ -132,7 +135,6 @@ function generateAccountNumber(part1)
 
     return creatednumber
 end
-
 function delete(sourceAccount)
     if accounts[sourceAccount] == nil then
         return "missingAccount"
@@ -206,6 +208,11 @@ function removeFunds(sourceAccount, value, save)
         return "negativeValue"
     end
 
+    if accounts[sourceAccount].balance < value then
+        return "notEnough"
+    end
+
+
     accounts[sourceAccount].balance = accounts[sourceAccount].balance - value
 
     if save then
@@ -277,3 +284,66 @@ function transferFunds(sourceAccount, targetAccount, value, save)
 
     return "done"
 end
+function setAccountMain(sourceAccount, ownerId, status)
+    if accounts[sourceAccount] == nil then
+        return "missingAccount"
+    end
+
+    if accounts[sourceAccount].main then
+        return "alreadyMain"
+    end
+
+    local mainAccount = getMainAccountByOwner(ownerId)
+    if mainAccount then
+        accounts[mainAccount.number].main = not status
+        accounts[mainAccount.number].changed = true
+    end
+
+    accounts[sourceAccount].main = status
+    accounts[sourceAccount].changed = true
+
+    return "done"
+end
+
+
+-- TESTING (later on will be put in as an admin command, highest/developer rank only)
+RegisterCommand("cba", function(source, args)
+    local client = source
+    create(client, 150, os.time(), {
+        account_created = os.time(),
+        account_name = "NO NAME"
+    })
+end)
+RegisterCommand("rba", function(source, args)
+    local sourceAcc = tonumber(args[1])
+
+    local done = delete(sourceAcc)
+
+    print("DELETE ACC", sourceAcc, done)
+end)
+RegisterCommand("check", function(source, args)
+    local val = tonumber(args[1])
+    local sourceAcc = tonumber(args[2])
+
+    local hasValue = checkFunds(sourceAcc, val, false)
+
+    print("CHECK FUNDS", sourceAcc, val, hasValue)
+end)
+RegisterCommand("remove", function(source, args)
+    local val = tonumber(args[1])
+    local sourceAcc = tonumber(args[2])
+
+    local done = removeFunds(sourceAcc, val, true)
+
+    print("REMOVE FUNDS", sourceAcc, val, done)
+end)
+RegisterCommand("transfer", function(source, args)
+    local val = tonumber(args[1])
+    local sourceAcc = tonumber(args[2])
+    local targetAcc = tonumber(args[3])
+
+    local done = transferFunds(sourceAcc, targetAcc, val, true)
+
+    print("TRANSFER FUNDS", sourceAcc, targetAcc, val, done)
+end)
+--

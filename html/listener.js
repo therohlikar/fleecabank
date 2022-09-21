@@ -74,7 +74,7 @@ $(function () {
 				settings = event.data.settings;
 
 				openmenu("main");
-				opencontent('accountlist');		
+				opencontent('accountlist');
 				break;
 			case 'hide':
 				$('#box').hide();
@@ -381,14 +381,9 @@ function opencontent(name){
 		$('#content').html('<ul>');
 		var count = 0;
 		$.each(accounts, function(key, value) {
-			if(key != 'personalinvoices' && key != 'fines'){
-				count++;
-				var accounttype = "OSOBNÍ ÚČET";
-				if(accounts[key].access_list.job.name != "none"){
-					accounttype = "FIREMNÍ ÚČET";
-				}
-				$('#content').append("<li onclick='selectaccount(" + key + ")' class='list-point activate'><span class='to-the-left type-" + key + "'>" + accounttype + ": " + key + "</span><span class='in-the-middle description-"+ key + "'>" + accounts[key].description + "</span></span></li>");
-			}
+		    count++;
+            var accounttype = "OSOBNÍ ÚČET";
+            $('#content').append("<li onclick='selectaccount(" + key + ")' class='list-point activate'><span class='to-the-left type-" + key + "'>" + accounttype + ": " + key + "</span><span class='in-the-middle description-"+ key + "'>BANKOVNÍ ÚČET</span></span></li>");
 		});
 
 		if(count<=0){
