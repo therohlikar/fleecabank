@@ -235,6 +235,11 @@ function create(owner, balance, number, data, main)
     end
 
     local try = 0
+
+    if number == nil then
+        number = os.time()
+    end
+
     number = generateAccountNumber(tostring(number))
     while accounts[number] ~= nil do
         number = generateAccountNumber(tostring(number))
@@ -247,7 +252,10 @@ function create(owner, balance, number, data, main)
     end
 
     if data == nil then
-        data = {}
+        data = {
+            account_name = "CHANGE ME",
+            account_created = os.time()
+        }
     end
 
     if main == nil then
@@ -493,7 +501,7 @@ function setAccountMain(sourceAccount, ownerId, status)
 
     return "done"
 end
-function updateAccountData(sourceAccount, variable, value, save)
+function updateAccountData(sourceAccount, variable, value)
     if accounts[sourceAccount] == nil then
         return "missingAccount"
     end

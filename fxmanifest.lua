@@ -3,6 +3,22 @@ game 'gta5'
 
 export "openBank"
 
+
+server_export "doesAccountExist"
+server_export "getMainAccountByOwner"
+server_export "getAccountsByOwner"
+server_export "getAccountByNumber"
+server_export "isBankAccountOwner"
+server_export "create"
+server_export "delete"
+server_export "checkFunds"
+server_export "removeFunds"
+server_export "addFunds"
+server_export "transferFunds"
+server_export "updateAccountData"
+
+
+
 client_scripts {
 	"config.lua",
 	"client/main.lua"
