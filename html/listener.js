@@ -1,10 +1,5 @@
 var accounts = null;
-var inMachine = false;
-var inMachineAccount = null;
-
-var currentPermissions = null;
 var selectedAccount = 0;
-
 var blockInput = false;
 
 document.onkeyup = function (data) {
@@ -24,25 +19,8 @@ function formatCurrency(price) {
 $(function () {
 	window.addEventListener('message', function (event) {
 		switch (event.data.action) {
-			case 'show-machine':
-				$('#box').show();
-				inMachine = true;
-
-				selectedAccount = event.data.account.number;
-				inMachineAccount = event.data.account;
-				settings = event.data.settings;
-
-				openmenu("cash-machine");
-				opencontent('cashmachine-login');	
-				break;
-			case 'hide-machine':
-				inMachine = false;
-				$('#box').hide();
-				break;
 			case 'show':
-				$('#box').show();	
-				inMachine = false;
-
+				$('#box').show();
 				selectedAccount = 0;
 				accounts = event.data.accounts;
 				settings = event.data.settings;
@@ -211,11 +189,6 @@ function opencontent(name){
 		$('#btn-withdraw').show();
 	}else if(name == "edit_description"){
 		$('#content').html("<div class='list-point'>Aktuální název účtu: <span class='description-" + selectedAccount + "'>" + accounts[selectedAccount].data.account_name + "</span></div><div class='block'><input type='text' id='input-text' value='" + accounts[selectedAccount].data.account_name + "'><button onclick=\"rename()\" class='activate' type='submit' id='btn-rename'>Přejmenovat účet</button></div>");
-	}else if(name == "cashmachine-login"){
-		$('#content').html("<div class='block'><input type='text' id='input-text' placeholder='Zadejte přístupový kód'><button onclick=\"logincard()\" class='activate' type='submit' id='btn-card-login'>Vstoupit</button></div>");
-	}else if(name == "cash-machine"){
-		$('#content').html("<div class='list-point'>Aktuální stav účtu: <span class='balance-" + selectedAccount + "'>$" + inMachineAccount.balance + "</span></div>");
-		$('#content').append("<div class='block'><input type='number' id='input-number' placeholder='0' min='0'><button onclick='cash(\"deposit\")' class='activate' type='submit' id='btn-deposit'>Vložit peníze na účet</button><button onclick='cash(\"withdraw\")' class='activate' type='submit' id='btn-withdraw'>Vybrat peníze z účtu</button></div>");
 	}
 }
 
@@ -224,15 +197,12 @@ function openmenu(name){
 		selectedAccount = 0;
 
 		$('#logged-menu').hide();
-		$('#cashmachine-menu').hide();
 		$('#unlogged-menu').show();
 	}else if(name == "account"){
 		$('#unlogged-menu').hide();
-		$('#cashmachine-menu').hide();
 		$('#logged-menu').show();
 	}else{
 		$('#logged-menu').hide();
-		$('#cashmachine-menu').show();
 		$('#unlogged-menu').hide();
 	}
 }

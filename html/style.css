@@ -84,8 +84,8 @@ button{border: none; padding: 4px; width: 22.5%; font-size: 14px; background-col
 #nav span .close{color: rgb(128, 35, 35);}
 #nav span .close:hover{color: rgb(167, 33, 33);}
 
-::-webkit-scrollbar {width: 0.3vw;}
-::-webkit-scrollbar-track {border: 0.2px solid #fbf9f2;}
-::-webkit-scrollbar-thumb {background: #356d0f;}
-::-webkit-scrollbar-thumb:hover {background: #2c5c0c;}
+::-webkit-scrollbar {width: 0.1vw;}
+::-webkit-scrollbar-track {border: 0.1px solid #000;}
+::-webkit-scrollbar-thumb {background: #295b80;}
+::-webkit-scrollbar-thumb:hover {background: #1b3f59;}
 textarea, select, input, button { outline: none; }
