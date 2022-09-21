@@ -1,4 +1,13 @@
 local accounts = {}
+local _tempCharId = 2 -- remove me my beauty
+
+--local ESX = exports["rflx_extended"]:getSharedObject()
+
+--local xPlayer = ESX.GetPlayerFromId(client)
+--if xPlayer then
+--    local identifier = xPlayer.char
+-- end
+
 
 MySQL.ready(function()
     Wait(5)
@@ -32,9 +41,31 @@ RegisterNetEvent("fleecabank:open")
 AddEventHandler("fleecabank:open",
     function()
         local client = source
-
-        local count, accessedAccounts = getAccountsByOwner(client)
+        --local xPlayer = ESX.GetPlayerFromId(client)
+        --if xPlayer then
+        --    local identifier = xPlayer.char
+            local count, accessedAccounts = 0, {}
+            count, accessedAccounts.accounts = getAccountsByOwner(_tempCharId) -- getAccountsByOwner(identifier)
+            accessedAccounts.charId = _tempCharId -- identifier
+        -- end
         TriggerClientEvent("fleecabank:open", client, accessedAccounts, count)
+    end
+)
+
+RegisterNetEvent("fleecabank:create")
+AddEventHandler("fleecabank:create",
+    function()
+        local client = source
+        --local xPlayer = ESX.GetPlayerFromId(client)
+        --if xPlayer then
+            -- local identifier = xPlayer.char
+            -- create(identifier,
+            local done, newAccount = create(_tempCharId, 0, os.time(), {
+                account_name = "CHANGE NAME",
+                account_created = os.time()
+            }, false)
+        --end
+        TriggerClientEvent("fleecabank:create", client, done, newAccount)
     end
 )
 
@@ -42,21 +73,111 @@ RegisterNetEvent("fleecabank:paymain")
 AddEventHandler("fleecabank:paymain",
     function(amount)
         local client = source
-
-        local done = removeFunds(getMainAccountByOwner(client).number, amount, true)
+        --local xPlayer = ESX.GetPlayerFromId(client)
+        --if xPlayer then
+            -- local identifier = xPlayer.char
+            -- removeFunds(getMainAccountByOwner(identifier).number, amount, true)
+            local done = removeFunds(getMainAccountByOwner(client).number, amount, true)
+        --end
         TriggerClientEvent("fleecabank:paymain", client, done, amount)
     end
 )
+
+RegisterNetEvent("fleecabank:transfer")
+AddEventHandler("fleecabank:transfer",
+    function(sourceAccount, targetAccount, amount)
+        local client = source
+
+        local done = transferFunds(sourceAccount, targetAccount, amount, true)
+        TriggerClientEvent("fleecabank:transfer", client, done, accounts[sourceAccount])
+    end
+)
+
+RegisterNetEvent("fleecabank:rename")
+AddEventHandler("fleecabank:rename",
+    function(sourceAccount, val)
+        local client = source
+
+        local done = updateAccountData(sourceAccount, "account_name", val)
+        TriggerClientEvent("fleecabank:rename", client, done, accounts[sourceAccount])
+    end
+)
+
+RegisterNetEvent("fleecabank:delete")
+AddEventHandler("fleecabank:delete",
+    function(sourceAccount)
+        local client = source
+
+        --local xPlayer = ESX.GetPlayerFromId(client)
+        --if xPlayer then
+        --    local identifier = xPlayer.char
+        local done = delete(sourceAccount)
+        local count, accounts = getAccountsByOwner(_tempCharId) -- getAccountsByOwner(identifier)
+        --end
+        TriggerClientEvent("fleecabank:delete", client, done, count, accounts)
+    end
+)
+
+RegisterNetEvent("fleecabank:cash")
+AddEventHandler("fleecabank:cash",
+    function(sourceAccount, amount, action)
+        local client = source
+
+        --local xPlayer = ESX.GetPlayerFromId(client)
+        --if xPlayer then
+        --    local identifier = xPlayer.char
+
+
+        local done = ""
+        if action == "withdraw" then
+            done = removeFunds(sourceAccount, amount, true)
+            if done == "done" then
+                -- xPlayer.addMoney(amount)
+            end
+        elseif action == "deposit" then
+                --if amount >= xPlayer.getMoney() then
+                done = addFunds(sourceAccount, amount, true)
+                if done == "done" then
+                    -- xPlayer.removeMoney(amount)
+                end
+            --end
+        end
+        TriggerClientEvent("fleecabank:cash", client, done, amount, action, accounts[sourceAccount])
+    end
+)
+
+RegisterNetEvent("fleecabank:syncAccount")
+AddEventHandler("fleecabank:syncAccount",
+    function(sourceAccount)
+        local client = source
+        TriggerClientEvent("fleecabank:syncAccount", client, getAccountByNumber(sourceAccount))
+    end
+)
+
 function saveAccounts()
-    print("FLEECABANK: CHANGED BANK ACCOUNTS SAVED")
+    for k,_ in pairs(accounts) do
+        if accounts[k] ~= nil and accounts[k].changed then
+            accounts[k].changed = false
+            MySQL.Async.execute(
+                "INSERT INTO bank_accounts (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data) ON DUPLICATE KEY UPDATE owner = @owner, balance = @balance, main = @main, data = @data",
+                {
+                    ["@number"] = k,
+                    ["@owner"] = accounts[k].owner,
+                    ["@balance"] = accounts[k].balance,
+                    ["@main"] = accounts[k].main,
+                    ["@data"] = json.encode(accounts[k].data)
+                }
+            )
+
+            print("BANK ACCOUNT SAVED: " .. k)
+        end
+    end
 
     SetTimeout(25000, saveAccounts)
 end
-
 function doesAccountExist(sourceAccount)
-    return (accounts[sourceAccount] ~= nil) and true or false
+    return (accounts[sourceAccount] ~= nil)
 end
-
 function getMainAccountByOwner(ownerId)
     local mainAccount = nil
     for k,v in pairs(accounts) do
@@ -67,15 +188,42 @@ function getMainAccountByOwner(ownerId)
     return mainAccount
 end
 function getAccountsByOwner(ownerId)
+    if ownerId == nil then
+        return "missingVariable"
+    end
+
     local _owned = {}
     local _count = 0
     for k,v in pairs(accounts) do
         if v.owner == ownerId then
-            _owned[k] = v
+            _owned[k] = {
+                data = {
+                    account_name = v.data.account_name
+                },
+                balance = v.balance
+            }
             _count = _count + 1
         end
     end
     return _count, _owned
+end
+function getAccountByNumber(sourceAccount)
+    if sourceAccount == nil or accounts[sourceAccount] == nil then
+        return "missingAccount"
+    end
+
+    return accounts[sourceAccount]
+end
+function isBankAccountOwner(sourceAccount, ownerId)
+    if sourceAccount == nil or accounts[sourceAccount] == nil then
+        return "missingAccount"
+    end
+
+    if ownerId == nil then
+        return "missingVariables"
+    end
+
+    return (accounts[sourceAccount].owner == ownerId)
 end
 function create(owner, balance, number, data, main)
     if owner == nil then
@@ -102,8 +250,21 @@ function create(owner, balance, number, data, main)
         data = {}
     end
 
+    if main == nil then
+        main = false
+    end
+
+    accounts[number] = {
+        number = number,
+        owner = owner,
+        balance = balance,
+        main = main,
+        data = data,
+        changed = false
+    }
+
     MySQL.Async.execute(
-        "INSERT INTO bank_accounts (number, owner, balance, data) VALUES (@number, @owner, @balance, @main, @data)",
+        "INSERT INTO bank_accounts (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data)",
         {
             ["@number"] = number,
             ["@owner"] = json.encode(owner),
@@ -111,17 +272,9 @@ function create(owner, balance, number, data, main)
             ["@main"] = main,
             ["@data"] = json.encode(data)
         },
-        function()
-            accounts[number] = {
-                number = number,
-                founder = owner,
-                balance = balance,
-                data = data,
-                changed = false
-            }
-        end
-    )
-    return "done", number
+        function() end)
+
+    return "done", accounts[number]
 end
 function generateAccountNumber(part1)
     local creatednumber = part1.sub(part1, 1, 2)
@@ -133,21 +286,25 @@ function generateAccountNumber(part1)
         length = length - randomnumber.len(randomnumber)
     end
 
-    return creatednumber
+    return tonumber(creatednumber)
 end
 function delete(sourceAccount)
     if accounts[sourceAccount] == nil then
         return "missingAccount"
     end
 
+    if not Config.enableDeleteNotEmptyBankAccount and accounts[sourceAccount].balance >= 0 then
+        return "notEmpty"
+    end
+
+    accounts[sourceAccount] = nil
     MySQL.Async.execute(
         "DELETE FROM bank_accounts WHERE number=@number",
         {
             ["@number"] = sourceAccount
         },
         function()
-            accounts[sourceAccount] = nil
-            return "done"
+
         end
     )
     return "done"
@@ -212,8 +369,40 @@ function removeFunds(sourceAccount, value, save)
         return "notEnough"
     end
 
-
     accounts[sourceAccount].balance = accounts[sourceAccount].balance - value
+
+    if save then
+        MySQL.Async.execute(
+            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            {
+                ["balance"] = accounts[sourceAccount].balance,
+                ["number"] = sourceAccount
+            }
+        )
+    else
+        accounts[sourceAccount].changed = true
+    end
+
+    return "done"
+end
+function addFunds(sourceAccount, value, save)
+    if sourceAccount == nil or value == nil then
+        return "missingVariable"
+    end
+
+    if accounts[sourceAccount] == nil then
+        return "missingAccount"
+    end
+
+    if type(value) ~= "number" then
+        value = tonumber(value)
+    end
+
+    if value <= 0 then
+        return "negativeValue"
+    end
+
+    accounts[sourceAccount].balance = accounts[sourceAccount].balance + value
 
     if save then
         MySQL.Async.execute(
@@ -304,12 +493,28 @@ function setAccountMain(sourceAccount, ownerId, status)
 
     return "done"
 end
+function updateAccountData(sourceAccount, variable, value, save)
+    if accounts[sourceAccount] == nil then
+        return "missingAccount"
+    end
 
+    if accounts[sourceAccount].data == nil then
+        return "missingDataTable"
+    end
+
+    if accounts[sourceAccount].data[variable] == nil then
+        return "missingVariable"
+    end
+
+    accounts[sourceAccount].data[variable] = value
+    accounts[sourceAccount].changed = true
+    return "done"
+end
 
 -- TESTING (later on will be put in as an admin command, highest/developer rank only)
 RegisterCommand("cba", function(source, args)
     local client = source
-    create(client, 150, os.time(), {
+    create(client, 0, os.time(), {
         account_created = os.time(),
         account_name = "NO NAME"
     })
