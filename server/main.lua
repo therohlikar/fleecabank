@@ -122,7 +122,7 @@ function create(owner, balance, number, data)
 end
 function generateAccountNumber(part1)
     local creatednumber = part1.sub(part1, 1, 2)
-    local length = 10 - creatednumber.len(creatednumber)
+    local length = 6 - creatednumber.len(creatednumber)
 
     while length > 0 do
         local randomnumber = tostring(math.random(10, 99))
