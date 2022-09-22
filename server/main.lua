@@ -39,7 +39,7 @@ end)
 -- check is close, or it will probably could be opened by some random dick fuck (I mean, it will just open his bank account, but why not to ban that prick)
 RegisterNetEvent("fleecabank:open")
 AddEventHandler("fleecabank:open",
-    function()
+    function(atm)
         local client = source
         --local xPlayer = ESX.GetPlayerFromId(client)
         --if xPlayer then
@@ -48,7 +48,7 @@ AddEventHandler("fleecabank:open",
             count, accessedAccounts.accounts = getAccountsByOwner(_tempCharId) -- getAccountsByOwner(identifier)
             accessedAccounts.charId = _tempCharId -- identifier
         -- end
-        TriggerClientEvent("fleecabank:open", client, accessedAccounts, count)
+        TriggerClientEvent("fleecabank:open", client, accessedAccounts, count, atm)
     end
 )
 

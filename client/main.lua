@@ -5,7 +5,16 @@ RegisterCommand("open", function(source, args)
         isOpened = false
     else
         isOpened = true
-        TriggerServerEvent("fleecabank:open")
+        TriggerServerEvent("fleecabank:open", false)
+    end
+end)
+
+RegisterCommand("openatm", function(source, args)
+    if isOpened then
+        isOpened = false
+    else
+        isOpened = true
+        TriggerServerEvent("fleecabank:open", true)
     end
 end)
 
@@ -70,8 +79,8 @@ AddEventHandler("fleecabank:create",
 
 RegisterNetEvent("fleecabank:open")
 AddEventHandler("fleecabank:open",
-    function(data, count)
-        openBank(data, count)
+    function(data, count, atm)
+        openBank(data, count, atm)
     end
 )
 
@@ -101,7 +110,7 @@ function updateAccounts(count, data, delete)
         })
     end
 end
-function openBank(data, count)
+function openBank(data, count, atm)
     SendNUIMessage({
         action = "show",
         accounts = data.accounts,
@@ -113,7 +122,8 @@ function openBank(data, count)
                 grade = 1
             },
             charId = data.charId
-        }
+        },
+        atm = atm
     })
     SetNuiFocus(true, true)
 end

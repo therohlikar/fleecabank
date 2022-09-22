@@ -2,6 +2,8 @@ var accounts = null;
 var selectedAccount = 0;
 var blockInput = false;
 
+var usingAtm = false;
+
 document.onkeyup = function (data) {
     if (data.which === 27) {
         closePanel();
@@ -24,6 +26,13 @@ $(function () {
 				selectedAccount = 0;
 				accounts = event.data.accounts;
 				settings = event.data.settings;
+                usingAtm = event.data.atm;
+
+                if(usingAtm){
+                    $('#newaccount').hide();
+                }else{
+                    $('#newaccount').show();
+                }
 
 				openmenu("main");
 				opencontent('accountlist');
@@ -145,6 +154,7 @@ function deleteaccount(){
 }
 
 function opencontent(name){
+    currentContent = name;
 	if(name == "accountlist"){
 		openmenu("main");
 
@@ -161,26 +171,36 @@ function opencontent(name){
 		
 		$('#content').append('</ul>');
 	}else if(name == "newaccount"){
-		openmenu("main");
-        $('#content').html("");
-		if(settings.count >= settings.maxAccounts){
-			$('#content').html("<div onclick=\"opencontent('accountlist')\" class='list-point red-activate'>SPRAVUJETE JIŽ MAXIMÁLNÍ MNOŽSTVÍ ÚČTŮ</div>");
-		}else{
-			$('#content').append("<div onclick=\"createaccount()\" class='list-point activate'>Otevřít nový účet</div>");
+	    if(usingAtm) {
+            $('#content').html("<div class='red-point list-point'>Tato akce není v bankomatu dostupná.</div>");
+        }else{
+            openmenu("main");
+            $('#content').html("");
+            if(settings.count >= settings.maxAccounts){
+                $('#content').html("<div onclick=\"opencontent('accountlist')\" class='list-point red-activate'>SPRAVUJETE JIŽ MAXIMÁLNÍ MNOŽSTVÍ ÚČTŮ</div>");
+            }else{
+                $('#content').append("<div onclick=\"createaccount()\" class='list-point activate'>Otevřít nový účet</div>");
+            }
 		}
 	}else if(name == "information"){
 		$('#content').html("<div onclick=\"copyToClipboard(accountnumber)\" class='list-point activate'>Číslo účtu: <span class='to-the-right' id='accountnumber'>" + selectedAccount + "</span></div>");
 		$('#content').append("<div class='list-point'>Typ účtu: <span class='to-the-right type-" + selectedAccount + "'>OSOBNÍ ÚČET</span></div>");
 		$('#content').append("<div class='list-point'>Aktuální stav účtu: <span class='to-the-right balance-" + selectedAccount + "'>" + formatCurrency(accounts[selectedAccount].balance) + "</span></div>");
 		$('#content').append("<div onclick=\"opencontent('edit_description')\" class='list-point activate'>Název účtu: <span class='to-the-right description-" + selectedAccount + "'>" + accounts[selectedAccount].data.account_name + "</span></div>");
-		if(!accounts[selectedAccount].main) $('#content').append("<div onclick=\"opencontent('delete')\" class='list-point red-activate'>Permanentně smazat účet</div>");
-		else $('#content').append("<div class='red-point list-point'>Účet je označen jako hlavní, nelze smazat</div>");
+		if(!usingAtm){
+		    if(!accounts[selectedAccount].main) $('#content').append("<div onclick=\"opencontent('delete')\" class='list-point red-activate'>Permanentně smazat účet</div>");
+        	else $('#content').append("<div class='red-point list-point'>Účet je označen jako hlavní, nelze smazat</div>");
+		}
 	}else if(name == "transfers"){
         $('#content').html("");
         $('#content').append("<div class='list-point'>Aktuální stav účtu: <span class='balance-" + selectedAccount + "'>" + formatCurrency(accounts[selectedAccount].balance) + "</span></div>");
         $('#content').append("<div class='block'><input type='text' id='input-text' placeholder='Protiúčet' maxlength='10'><input type='number' id='input-number' value='0' min='0'><button onclick='transfer()' class='activate' type='submit' id='btn-transfer'>Zpracovat platbu</button></div>");
 	}else if(name == "delete"){
-		$('#content').html("<div onclick=\"opencontent('information')\" class='list-point activate'>Ponechat účet</div><div onclick=\"deleteaccount()\" class='list-point red-activate'>Permatnentně smazat účet</div>");
+	    if(usingAtm) {
+	        $('#content').html("<div class='red-point list-point'>Tato akce není v bankomatu dostupná.</div>");
+	    }else {
+		    $('#content').html("<div onclick=\"opencontent('information')\" class='list-point activate'>Ponechat účet</div><div onclick=\"deleteaccount()\" class='list-point red-activate'>Permatnentně smazat účet</div>");
+	    }
 	}else if(name == "cash"){
 		$('#content').html("");
 		$('#content').append("<div class='list-point'>Aktuální stav účtu: <span class='balance-" + selectedAccount + "'>" + formatCurrency(accounts[selectedAccount].balance) + "</span></div>");
@@ -188,7 +208,11 @@ function opencontent(name){
 		$('#btn-deposit').show();
 		$('#btn-withdraw').show();
 	}else if(name == "edit_description"){
-		$('#content').html("<div class='list-point'>Aktuální název účtu: <span class='description-" + selectedAccount + "'>" + accounts[selectedAccount].data.account_name + "</span></div><div class='block'><input type='text' id='input-text' value='" + accounts[selectedAccount].data.account_name + "'><button onclick=\"rename()\" class='activate' type='submit' id='btn-rename'>Přejmenovat účet</button></div>");
+	    if(usingAtm) {
+            $('#content').html("<div class='red-point list-point'>Tato akce není v bankomatu dostupná.</div>");
+        }else{
+		    $('#content').html("<div class='list-point'>Aktuální název účtu: <span class='description-" + selectedAccount + "'>" + accounts[selectedAccount].data.account_name + "</span></div><div class='block'><input type='text' id='input-text' value='" + accounts[selectedAccount].data.account_name + "'><button onclick=\"rename()\" class='activate' type='submit' id='btn-rename'>Přejmenovat účet</button></div>");
+	    }
 	}
 }
 
