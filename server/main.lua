@@ -153,6 +153,58 @@ AddEventHandler("fleecabank:syncAccount",
         TriggerClientEvent("fleecabank:syncAccount", client, getAccountByNumber(sourceAccount))
     end
 )
+--[[
+RegisterNetEvent("fleecabank:choosepaymentmethod")
+AddEventHandler("fleecabank:choosepaymentmethod",
+    function(data, methodType, methodId)
+        local client = source
+        local done = "missingAmount"
+        if methodType == "cash" then
+            -- if xPlayer.getMoney() >= data.amount then
+            --      xPlayer.removeMoney(data.amount)
+            --      done = "done"
+            -- end
+            done = "done"
+        elseif methodType == "account" then
+            done = checkFunds(methodId, data.amount, true, true)
+        end
+
+        TriggerClientEvent("fleecabank:choosepaymentmethod", client, done, data, methodType, methodId)
+    end
+)
+
+RegisterNetEvent("fleecabank:payfine")
+AddEventHandler("fleecabank:payfine",
+    function(data)
+        local client = source
+        openPaymentMethod(client, {})
+    end
+)
+
+function openPaymentMethod(client, data)
+    -- data to test
+    data = {
+        title = "ZAPLACENÍ POKUTY",
+        amount = 5000,
+        success = "",
+        sadface = string.dump(function()
+            print("SAD FACE BY FUNC")
+            end)
+    }
+    --
+    local methods = Config.defaultPaymentMethodsAllowed
+    if methods.cash then
+        methods.data.cash = 10000 -- xPlayer.getMoney()
+    end
+    if methods.account then
+        local _, accounts = getAccountsByOwner(_tempCharId) -- xPlayer.char
+        methods.data.account = accounts
+    end
+    if methods.card then
+        -- get cards which he has
+    end
+    TriggerClientEvent("fleecabank:paymentmethod", client, data, methods)
+end]]
 
 function saveAccounts()
     for k,_ in pairs(accounts) do

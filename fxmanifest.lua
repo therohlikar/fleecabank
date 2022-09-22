@@ -3,7 +3,6 @@ game 'gta5'
 
 export "openBank"
 
-
 server_export "doesAccountExist"
 server_export "getMainAccountByOwner"
 server_export "getAccountsByOwner"
@@ -16,11 +15,11 @@ server_export "removeFunds"
 server_export "addFunds"
 server_export "transferFunds"
 server_export "updateAccountData"
-
-
+server_export "openPaymentMethod"
 
 client_scripts {
 	"config.lua",
+	"@warmenu/warmenu.lua",
 	"client/main.lua"
 }
 

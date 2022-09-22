@@ -13,6 +13,10 @@ RegisterCommand("payrent", function(source, args)
     TriggerServerEvent("fleecabank:paymain", 20)
 end)
 
+--[[RegisterCommand("payfine", function(source, args)
+    TriggerServerEvent("fleecabank:payfine")
+end)]]
+
 RegisterNetEvent("fleecabank:paymain")
 AddEventHandler("fleecabank:paymain",
     function(done)
@@ -137,3 +141,70 @@ RegisterNUICallback("action", function(data, cb)
         TriggerServerEvent("fleecabank:cash", data.account, tonumber(data.value), data.subaction)
     end
 end)
+
+--[[
+RegisterNetEvent("fleecabank:paymentmethod")
+AddEventHandler("fleecabank:paymentmethod",
+    function(data, methods)
+        WarMenu.CreateMenu(
+            "payment_methods",
+            data.title,
+            "Zvolte způsob úhrady (" .. getFormattedCurrency(data.amount) .. ")"
+        )
+        WarMenu.OpenMenu("payment_methods")
+        WarMenu.CreateSubMenu("method_account", "payment_methods", "Zvolte bankovní účet")
+        WarMenu.CreateSubMenu("method_card", "payment_methods", "Zvolte platební kartu v ruce")
+
+        while true do
+            if WarMenu.IsMenuOpened("payment_methods") then
+                if methods.cash and WarMenu.Button("Zaplatit hotovostí") then
+                    TriggerServerEvent("fleecabank:choosepaymentmethod", data, "cash")
+                    WarMenu.CloseMenu()
+                end
+
+                if methods.account then
+                    WarMenu.MenuButton("Uhradit převodem z účtu", "method_account")
+                end
+
+                if methods.card then
+                    WarMenu.MenuButton("Uhradit platební kartou", "method_card")
+                end
+                WarMenu.Display()
+            elseif methods.account and WarMenu.IsMenuOpened("method_account") then
+                for k, v in pairs(methods.data.account) do
+                    if WarMenu.Button(v.data.account_name, k) then
+                        TriggerServerEvent("fleecabank:choosepaymentmethod", data, "account", k)
+                        WarMenu.CloseMenu()
+                    end
+                end
+
+                WarMenu.Display()
+            elseif methods.card and WarMenu.IsMenuOpened("method_card") then
+
+                WarMenu.Display()
+            else
+                WarMenu.CloseMenu()
+                break
+            end
+
+            Citizen.Wait(0)
+        end
+    end
+)
+]]
+
+--[[RegisterNetEvent("fleecabank:choosepaymentmethod")
+AddEventHandler("fleecabank:choosepaymentmethod",
+    function(done, data, methodType, methodId)
+        if done == "done" then
+            print("YAAAAY", methodType, methodId, data.amount)
+        else
+            print("SAD FACE", done, methodType, methodId, data.amount)
+        end
+    end
+)]]
+
+function getFormattedCurrency(value)
+    local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
+    return "$" .. left .. (num:reverse():gsub('(%d%d%d)', '%1' .. ","):reverse()) .. right
+end
