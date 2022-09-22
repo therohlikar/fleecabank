@@ -44,14 +44,14 @@ $(function () {
                 selectedAccount = 0;
                 accounts = event.data.accounts;
 
-                if(event.data.delete) settings.count--;
+                if(event.data.delete) settings.accountsLeft++;
 
                 blockInput = false;
 
                 openmenu("main");
                 opencontent('accountlist');
                 break;
-			case 'updateaccount':
+			case 'refreshDetails':
 			    var newAccountNumber = event.data.account.number
 				accounts[newAccountNumber] = event.data.account
 
@@ -61,7 +61,7 @@ $(function () {
 
 				blockInput = false;
 
-				if(event.data.newAccount) settings.count++;
+				if(event.data.newAccount) settings.accountsLeft--;
 
 				break;
 			default:
@@ -176,7 +176,7 @@ function opencontent(name){
         }else{
             openmenu("main");
             $('#content').html("");
-            if(settings.count >= settings.maxAccounts){
+            if(settings.accountsLeft <= 0){
                 $('#content').html("<div onclick=\"opencontent('accountlist')\" class='list-point red-activate'>SPRAVUJETE JIŽ MAXIMÁLNÍ MNOŽSTVÍ ÚČTŮ</div>");
             }else{
                 $('#content').append("<div onclick=\"createaccount()\" class='list-point activate'>Otevřít nový účet</div>");

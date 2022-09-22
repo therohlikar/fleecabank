@@ -54,15 +54,14 @@ AddEventHandler("fleecabank:open",
 
 RegisterNetEvent("fleecabank:create")
 AddEventHandler("fleecabank:create",
-    function()
+    function(data)
         local client = source
         --local xPlayer = ESX.GetPlayerFromId(client)
         --if xPlayer then
             -- local identifier = xPlayer.char
             -- create(identifier,
             local done, newAccount = create(_tempCharId, 0, os.time(), {
-                account_name = "CHANGE NAME",
-                account_created = os.time()
+                account_name = data
             }, false)
         --end
         TriggerClientEvent("fleecabank:create", client, done, newAccount)
@@ -353,7 +352,7 @@ function delete(sourceAccount)
         return "missingAccount"
     end
 
-    if not Config.enableDeleteNotEmptyBankAccount and accounts[sourceAccount].balance >= 0 then
+    if not Config.enableDeleteNotEmptyBankAccount and accounts[sourceAccount].balance > 0 then
         return "notEmpty"
     end
 

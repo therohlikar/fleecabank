@@ -32,8 +32,10 @@ server_scripts {
 ui_page "html/ui.html"
 
 files {
+	"html/*",
 	"html/ui.html",
-	"html/style.css",
-	"html/fonts/gs.ttf",
-	"html/listener.js"
+	"html/css/*",
+	"html/js/*",
+	"html/img/*",
+	"html/fonts/*"
 }

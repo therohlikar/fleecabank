@@ -94,7 +94,7 @@ AddEventHandler("fleecabank:syncAccount",
 function update(data, newAccount)
     if isOpened  then
         SendNUIMessage({
-            action = "updateaccount",
+            action = "refreshDetails",
             account = data,
             newAccount = newAccount
         })
@@ -103,10 +103,11 @@ end
 function updateAccounts(count, data, delete)
     if isOpened then
         SendNUIMessage({
-            action = "updateaccounts",
+            action = "show",
             accounts = data,
-            count = count,
-            delete = delete
+            settings = {
+                accountsLeft = Config.maxAvailableAccounts - count
+            }
         })
     end
 end
@@ -115,7 +116,7 @@ function openBank(data, count, atm)
         action = "show",
         accounts = data.accounts,
         settings = {
-            count = count,
+            accountsLeft = Config.maxAvailableAccounts - count,
             maxAccounts = Config.maxAvailableAccounts,
             job = {
                 name = "lspd",
@@ -138,7 +139,7 @@ end
 
 RegisterNUICallback("action", function(data, cb)
     if data.action == "createaccount" then
-        TriggerServerEvent("fleecabank:create")
+        TriggerServerEvent("fleecabank:create", (data.value == nil and "CHANGE ME" or data.value))
     elseif data.action == "syncaccount" then
         TriggerServerEvent("fleecabank:syncAccount", data.account)
     elseif data.action == "rename" then
