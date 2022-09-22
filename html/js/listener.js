@@ -86,6 +86,7 @@ $(function () {
                 $('#sendAmount').val('');
 
                 filter = "all";
+
                 accounts[event.data.account.number] = event.data.account;
 
                 if (event.data.accessData !== undefined) {
@@ -240,7 +241,7 @@ $("#addbankaccount").submit(function (event) {
 
         $.post('https://fleecabank/action', JSON.stringify({
             action: "createaccount",
-            value: $('#accountName').val()
+            account_name: $('#accountName').val()
         }));
 
         $('#accountName').val('');
@@ -440,7 +441,7 @@ function setupBankAccounts() {
                     </div>
                     <div class="col-9 border-left">
                       <div class="py-4 my-2 pl-4">
-                        <p class="text-4 font-weight-500 mb-1">${accountData.data.account_name}</p>
+                        <p class="text-4 font-weight-500 mb-1">${accountNumber}</p>
                         <p class="text-4 opacity-9 mb-1">${accountNumber}</p>
                       </div>
                     </div>

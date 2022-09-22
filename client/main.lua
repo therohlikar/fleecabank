@@ -117,7 +117,6 @@ function openBank(data, count, atm)
         accounts = data.accounts,
         settings = {
             accountsLeft = Config.maxAvailableAccounts - count,
-            maxAccounts = Config.maxAvailableAccounts,
             job = {
                 name = "lspd",
                 grade = 1
@@ -139,7 +138,7 @@ end
 
 RegisterNUICallback("action", function(data, cb)
     if data.action == "createaccount" then
-        TriggerServerEvent("fleecabank:create", (data.value == nil and "CHANGE ME" or data.value))
+        TriggerServerEvent("fleecabank:create", (data.account_name == nil and "CHANGE ME" or data.account_name))
     elseif data.action == "syncaccount" then
         TriggerServerEvent("fleecabank:syncAccount", data.account)
     elseif data.action == "rename" then

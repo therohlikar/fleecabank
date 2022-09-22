@@ -19,7 +19,6 @@ server_export "openPaymentMethod"
 
 client_scripts {
 	"config.lua",
-	"@warmenu/warmenu.lua",
 	"client/main.lua"
 }
 

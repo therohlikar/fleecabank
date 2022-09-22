@@ -1,19 +1,12 @@
 local accounts = {}
-local _tempCharId = 2 -- remove me my beauty
 
---local ESX = exports["rflx_extended"]:getSharedObject()
-
---local xPlayer = ESX.GetPlayerFromId(client)
---if xPlayer then
---    local identifier = xPlayer.char
--- end
-
+local ESX = exports["rflx_extended"]:getSharedObject()
 
 MySQL.ready(function()
     Wait(5)
 
     MySQL.Async.fetchAll(
-        "SELECT * FROM bank_accounts",
+        "SELECT * FROM bank_accounts_new",
         {},
         function(result)
             local _count = 0
@@ -41,30 +34,38 @@ RegisterNetEvent("fleecabank:open")
 AddEventHandler("fleecabank:open",
     function(atm)
         local client = source
-        --local xPlayer = ESX.GetPlayerFromId(client)
-        --if xPlayer then
-        --    local identifier = xPlayer.char
+        local xPlayer = ESX.GetPlayerFromId(client)
+        if xPlayer then
+            local identifier = xPlayer.char
+
             local count, accessedAccounts = 0, {}
-            count, accessedAccounts.accounts = getAccountsByOwner(_tempCharId) -- getAccountsByOwner(identifier)
-            accessedAccounts.charId = _tempCharId -- identifier
-        -- end
-        TriggerClientEvent("fleecabank:open", client, accessedAccounts, count, atm)
+            count, accessedAccounts.accounts = getAccountsByOwner(identifier)
+            accessedAccounts.charId = identifier
+
+            TriggerClientEvent("fleecabank:open", client, accessedAccounts, count, atm)
+            return
+        end
+
+        print("FLEECABANK ERROR", "TRYING TO OPEN, NOTHING HAPPENED", "SOURCE", client)
     end
 )
 
 RegisterNetEvent("fleecabank:create")
 AddEventHandler("fleecabank:create",
-    function(data)
+    function(account_name)
         local client = source
-        --local xPlayer = ESX.GetPlayerFromId(client)
-        --if xPlayer then
-            -- local identifier = xPlayer.char
-            -- create(identifier,
-            local done, newAccount = create(_tempCharId, 0, os.time(), {
-                account_name = data
+        local xPlayer = ESX.GetPlayerFromId(client)
+        if xPlayer then
+            local identifier = xPlayer.char
+            local done, newAccount = create(identifier, 0, os.time(), {
+                account_name = account_name
             }, false)
-        --end
-        TriggerClientEvent("fleecabank:create", client, done, newAccount)
+
+            TriggerClientEvent("fleecabank:create", client, done, newAccount)
+            return
+        end
+
+        print("FLEECABANK ERROR", "TRYING TO CREATE, NOTHING HAPPENED", "SOURCE", client)
     end
 )
 
@@ -72,13 +73,16 @@ RegisterNetEvent("fleecabank:paymain")
 AddEventHandler("fleecabank:paymain",
     function(amount)
         local client = source
-        --local xPlayer = ESX.GetPlayerFromId(client)
-        --if xPlayer then
-            -- local identifier = xPlayer.char
-            -- removeFunds(getMainAccountByOwner(identifier).number, amount, true)
-            local done = removeFunds(getMainAccountByOwner(client).number, amount, true)
-        --end
-        TriggerClientEvent("fleecabank:paymain", client, done, amount)
+        local xPlayer = ESX.GetPlayerFromId(client)
+        if xPlayer then
+            local identifier = xPlayer.char
+            local done = removeFunds(getMainAccountByOwner(identifier).number, amount, true)
+
+            TriggerClientEvent("fleecabank:paymain", client, done, amount)
+            return
+        end
+
+        print("FLEECABANK ERROR", "TRYING TO PAY MAIN ACCOUNT, NOTHING HAPPENED", "SOURCE", client)
     end
 )
 
@@ -86,7 +90,7 @@ RegisterNetEvent("fleecabank:transfer")
 AddEventHandler("fleecabank:transfer",
     function(sourceAccount, targetAccount, amount)
         local client = source
-
+        -- CHECK SOURCEACCOUNT OWNERSHIP
         local done = transferFunds(sourceAccount, targetAccount, amount, true)
         TriggerClientEvent("fleecabank:transfer", client, done, accounts[sourceAccount])
     end
@@ -96,7 +100,7 @@ RegisterNetEvent("fleecabank:rename")
 AddEventHandler("fleecabank:rename",
     function(sourceAccount, val)
         local client = source
-
+        -- CHECK SOURCEACCOUNT OWNERSHIP
         local done = updateAccountData(sourceAccount, "account_name", val)
         TriggerClientEvent("fleecabank:rename", client, done, accounts[sourceAccount])
     end
@@ -106,14 +110,18 @@ RegisterNetEvent("fleecabank:delete")
 AddEventHandler("fleecabank:delete",
     function(sourceAccount)
         local client = source
+        -- CHECK SOURCEACCOUNT OWNERSHIP
+        local xPlayer = ESX.GetPlayerFromId(client)
+        if xPlayer then
+            local identifier = xPlayer.char
+            local done = delete(sourceAccount)
+            local count, accounts = getAccountsByOwner(identifier)
 
-        --local xPlayer = ESX.GetPlayerFromId(client)
-        --if xPlayer then
-        --    local identifier = xPlayer.char
-        local done = delete(sourceAccount)
-        local count, accounts = getAccountsByOwner(_tempCharId) -- getAccountsByOwner(identifier)
-        --end
-        TriggerClientEvent("fleecabank:delete", client, done, count, accounts)
+            TriggerClientEvent("fleecabank:delete", client, done, count, accounts)
+            return
+        end
+
+        print("FLEECABANK ERROR", "TRYING TO DELETE AN ACCOUNT", sourceAccount, "SOURCE", client)
     end
 )
 
@@ -210,7 +218,7 @@ function saveAccounts()
         if accounts[k] ~= nil and accounts[k].changed then
             accounts[k].changed = false
             MySQL.Async.execute(
-                "INSERT INTO bank_accounts (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data) ON DUPLICATE KEY UPDATE owner = @owner, balance = @balance, main = @main, data = @data",
+                "INSERT INTO bank_accounts_new (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data) ON DUPLICATE KEY UPDATE owner = @owner, balance = @balance, main = @main, data = @data",
                 {
                     ["@number"] = k,
                     ["@owner"] = accounts[k].owner,
@@ -323,7 +331,7 @@ function create(owner, balance, number, data, main)
     }
 
     MySQL.Async.execute(
-        "INSERT INTO bank_accounts (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data)",
+        "INSERT INTO bank_accounts_new (number, owner, balance, main, data) VALUES (@number, @owner, @balance, @main, @data)",
         {
             ["@number"] = number,
             ["@owner"] = json.encode(owner),
