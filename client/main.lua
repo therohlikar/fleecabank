@@ -52,10 +52,10 @@ AddEventHandler("fleecabank:transfer",
 
 RegisterNetEvent("fleecabank:delete")
 AddEventHandler("fleecabank:delete",
-    function(done, count, accounts)
+    function(done, accounts)
         print("DELETE", done)
 
-        updateAccounts(count, accounts, true)
+        updateAccounts(accounts)
     end
 )
 
@@ -70,10 +70,10 @@ AddEventHandler("fleecabank:cash",
 
 RegisterNetEvent("fleecabank:create")
 AddEventHandler("fleecabank:create",
-    function(done, newAccount)
+    function(done, newAccount, accounts)
         print("CREATE", done)
 
-        update(newAccount, true)
+        update(newAccount, accounts)
     end
 )
 
@@ -91,23 +91,20 @@ AddEventHandler("fleecabank:syncAccount",
     end
 )
 
-function update(data, newAccount)
+function update(data, accounts)
     if isOpened  then
         SendNUIMessage({
             action = "refreshDetails",
             account = data,
-            newAccount = newAccount
+            accounts = accounts
         })
     end
 end
-function updateAccounts(count, data, delete)
+function updateAccounts(accounts)
     if isOpened then
         SendNUIMessage({
             action = "show",
-            accounts = data,
-            settings = {
-                accountsLeft = Config.maxAvailableAccounts - count
-            }
+            accounts = accounts
         })
     end
 end
@@ -117,10 +114,6 @@ function openBank(data, count, atm)
         accounts = data.accounts,
         settings = {
             accountsLeft = Config.maxAvailableAccounts - count,
-            job = {
-                name = "lspd",
-                grade = 1
-            },
             charId = data.charId
         },
         atm = atm

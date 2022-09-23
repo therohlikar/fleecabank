@@ -61,7 +61,9 @@ AddEventHandler("fleecabank:create",
                 account_name = account_name
             }, false)
 
-            TriggerClientEvent("fleecabank:create", client, done, newAccount)
+            local _, accounts = getAccountsByOwner(identifier)
+
+            TriggerClientEvent("fleecabank:create", client, done, newAccount, accounts)
             return
         end
 
@@ -115,9 +117,9 @@ AddEventHandler("fleecabank:delete",
         if xPlayer then
             local identifier = xPlayer.char
             local done = delete(sourceAccount)
-            local count, accounts = getAccountsByOwner(identifier)
+            local _, accounts = getAccountsByOwner(identifier)
 
-            TriggerClientEvent("fleecabank:delete", client, done, count, accounts)
+            TriggerClientEvent("fleecabank:delete", client, done, accounts)
             return
         end
 
@@ -366,7 +368,7 @@ function delete(sourceAccount)
 
     accounts[sourceAccount] = nil
     MySQL.Async.execute(
-        "DELETE FROM bank_accounts WHERE number=@number",
+        "DELETE FROM bank_accounts_new WHERE number=@number",
         {
             ["@number"] = sourceAccount
         },
@@ -403,7 +405,7 @@ function checkFunds(sourceAccount, value, remove, save)
 
     if save then
         MySQL.Async.execute(
-            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            "UPDATE bank_accounts_new SET balance=@balance WHERE number = @number",
             {
                 ["balance"] = accounts[sourceAccount].balance,
                 ["number"] = sourceAccount
@@ -440,7 +442,7 @@ function removeFunds(sourceAccount, value, save)
 
     if save then
         MySQL.Async.execute(
-            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            "UPDATE bank_accounts_new SET balance=@balance WHERE number = @number",
             {
                 ["balance"] = accounts[sourceAccount].balance,
                 ["number"] = sourceAccount
@@ -473,7 +475,7 @@ function addFunds(sourceAccount, value, save)
 
     if save then
         MySQL.Async.execute(
-            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            "UPDATE bank_accounts_new SET balance=@balance WHERE number = @number",
             {
                 ["balance"] = accounts[sourceAccount].balance,
                 ["number"] = sourceAccount
@@ -519,7 +521,7 @@ function transferFunds(sourceAccount, targetAccount, value, save)
 
     if save then
         MySQL.Async.execute(
-            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            "UPDATE bank_accounts_new SET balance=@balance WHERE number = @number",
             {
                 ["balance"] = accounts[sourceAccount].balance,
                 ["number"] = sourceAccount
@@ -527,7 +529,7 @@ function transferFunds(sourceAccount, targetAccount, value, save)
         )
 
         MySQL.Async.execute(
-            "UPDATE bank_accounts SET balance=@balance WHERE number = @number",
+            "UPDATE bank_accounts_new SET balance=@balance WHERE number = @number",
             {
                 ["balance"] = accounts[targetAccount].balance,
                 ["number"] = targetAccount

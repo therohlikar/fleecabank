@@ -87,8 +87,6 @@ $(function () {
 
                 filter = "all";
 
-                accounts[event.data.account.number] = event.data.account;
-
                 if (event.data.accessData !== undefined) {
                     access = event.data.accessData;
                 }
@@ -101,8 +99,17 @@ $(function () {
                     currentTransactions = event.data.logs;
                 }
 
-                //loadTransactions();
-                useAccount(event.data.account.number);
+                if(event.data.accounts !== undefined){
+                    accounts = event.data.accounts;
+                }
+
+                if(event.data.account !== undefined){
+                    accounts[event.data.account.number] = event.data.account;
+
+                    //loadTransactions();
+                    useAccount(event.data.account.number);
+                }
+
                 break;
             default:
                 console.log('bank: unknown action!');
@@ -407,6 +414,8 @@ function confirmRemoveAccount() {
             account: removeAccount,
             action: "delete"
         }));
+
+        accountsLeft++;
     }
 }
 
@@ -433,25 +442,25 @@ function setupBankAccounts() {
 
     $.each(accounts, function (accountNumber, accountData) {
         $('#bankAccountsListRows').prepend(`<div class="col-12 col-sm-6 bankAccountSingle">
-                <div class="account-card account-card-primary text-white rounded mb-4 mb-lg-0">
-                  <div class="row no-gutters">
-                    <div class="col-3 d-flex justify-content-center p-3">
-                      <div class="my-auto text-center"> <span class="text-13"><i class="fas fa-university"></i></span>
-                      </div>
-                    </div>
-                    <div class="col-9 border-left">
-                      <div class="py-4 my-2 pl-4">
-                        <p class="text-4 font-weight-500 mb-1">${accountNumber}</p>
-                        <p class="text-4 opacity-9 mb-1">${accountNumber}</p>
-                      </div>
-                    </div>
+            <div class="account-card account-card-primary text-white rounded mb-4 mb-lg-0">
+              <div class="row no-gutters">
+                <div class="col-3 d-flex justify-content-center p-3">
+                  <div class="my-auto text-center"> <span class="text-13"><i class="fas fa-university"></i></span>
                   </div>
-                  <a href="#" onclick="loadAccount(${accountNumber})" class="text-light btn-link mx-2">
-                  <div class="account-card-overlay rounded"> <span class="mr-1"><i class="fas fa-share"></i></span>Spravovat účet
-                  </div>
-                  </a> 
                 </div>
-              </div>`);
+                <div class="col-9 border-left">
+                  <div class="py-4 my-2 pl-4">
+                    <p class="text-4 font-weight-500 mb-1">${accountNumber}</p>
+                    <p class="text-4 opacity-9 mb-1">${accountData.data.account_name}</p>
+                  </div>
+                </div>
+              </div>
+              <a href="#" onclick="loadAccount(${accountNumber})" class="text-light btn-link mx-2">
+              <div class="account-card-overlay rounded"> <span class="mr-1"><i class="fas fa-share"></i></span>Spravovat účet
+              </div>
+              </a>
+            </div>
+          </div>`);
     });
 }
 
