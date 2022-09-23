@@ -10,7 +10,6 @@ let charId = 0
 let accountsLeft = 0
 let filter = "all";
 let company = "";
-let selectedIcon = 'fas fa-university';
 let currentTransactions = [];
 let balanceChart = null;
 
@@ -42,14 +41,6 @@ document.onkeyup = function (data) {
 };
 
 new ClipboardJS('.copy');
-
-$('.icp-dd').iconpicker({
-    title: 'Zvolte ikonku účtu',
-    hideOnSelect: true,
-    templates: {
-        search: '<input type="search" class="form-control iconpicker-search" placeholder="Hledat v ikonkách" />',
-    }
-});
 
 $(function () {
     window.addEventListener('message', function (event) {
@@ -478,7 +469,3 @@ function setupBankAccounts() {
 
     setTimeout(arguments.callee, 250);
 })();
-
-$('.icp-dd').on('iconpickerSelected', function (event) {
-    selectedIcon = event.iconpickerValue;
-});
