@@ -1,5 +1,13 @@
 # FLEECABANK
 
+[SERVER SIDE EXPORTS](## SERVER SIDE EXPORTS)
+
+[CLIENT SIDE EXPORTS](## CLIENT SIDE EXPORTS)
+
+[doesAccountExist](# doesAccountExist)
+
+
+
 ```lua
 local done =    "done" or 
                 "notEnough" or 
@@ -22,9 +30,9 @@ local done =    "done" or
 
 ## SERVER SIDE EXPORTS
 
-| doesAccountExist (sourceAccount [int]) |
-|:-------------------------------------- |
-| returns true or false                  |
+| #doesAccountExist (sourceAccount [int]) |
+|:--------------------------------------- |
+| returns true or false                   |
 
 *example:*
 
