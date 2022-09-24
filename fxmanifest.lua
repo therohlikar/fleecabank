@@ -15,9 +15,11 @@ server_export "removeFunds"
 server_export "addFunds"
 server_export "transferFunds"
 server_export "updateAccountData"
-server_export "openPaymentMethod"
+
+export "openPaymentMethod"
 
 client_scripts {
+	"@warmenu/warmenu.lua",
 	"config.lua",
 	"client/main.lua"
 }
