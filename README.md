@@ -157,7 +157,7 @@ print("DELETED?", done)
 ```
 
 | checkFunds (sourceAccount [int], value [int], remove [boolean], save [boolean])                                    |
-| ------------------------------------------------------------------------------------------------------------------ |
+|:------------------------------------------------------------------------------------------------------------------ |
 | if <u>remove </u>is set on true, the amount, after successful check, will be also removed in the end, if available |
 | if <u>save</u> is set on true, the execution will be saved into database right away                                |
 | returns status done [string]                                                                                       |
@@ -170,7 +170,7 @@ print("HAS ENOUGH?", done, "THEN REMOVE THE FUNDS")
 ```
 
 | **removeFunds (sourceAccount [int], value [int], save [boolean])**                  |
-| ----------------------------------------------------------------------------------- |
+|:----------------------------------------------------------------------------------- |
 | if <u>save</u> is set on true, the execution will be saved into database right away |
 | returns status done [string]                                                        |
 
@@ -182,7 +182,7 @@ print("REMOVED FUNDS?", done)
 ```
 
 | **addFunds (sourceAccount [int], value [int], save [boolean])**                     |
-| ----------------------------------------------------------------------------------- |
+|:----------------------------------------------------------------------------------- |
 | if <u>save</u> is set on true, the execution will be saved into database right away |
 | returns status done [string]                                                        |
 
@@ -194,7 +194,7 @@ print("ADDED FUNDS?", done)
 ```
 
 | transferFunds (sourceAccount [int], targetAccount [int], value [int], save [boolean]) |
-| ------------------------------------------------------------------------------------- |
+|:------------------------------------------------------------------------------------- |
 | if <u>save</u> is set on true, the execution will be saved into database right away   |
 | returns status done [string]                                                          |
 
@@ -220,7 +220,7 @@ end
 ```
 
 | **updateAccountData (sourceAccount [int], variable [string], value [?])** |
-| ------------------------------------------------------------------------- |
+|:------------------------------------------------------------------------- |
 | variable can be unique for any bank account, fe: <u>account_name</u>      |
 | returns status done [string]                                              |
 
@@ -236,7 +236,7 @@ print("CHANGED ACCOUNT VARIABLE", done)
 ## SERVER SIDE EXPORTS
 
 | **openPaymentMethod(data [table], success [func], failure [func])**                        |
-| ------------------------------------------------------------------------------------------ |
+|:------------------------------------------------------------------------------------------ |
 | in the end of events it will execute either "success" or "failure" depending on the result |
 
 *parameter data example:*
