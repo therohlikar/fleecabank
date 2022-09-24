@@ -2,7 +2,7 @@
 
 
 
-`every return of exported function`
+`every return of exported functions`
 
 ```lua
 local done =    "done" or 
