@@ -2,7 +2,7 @@
 
 
 
-`every return of exported function`
+`every return of exported functions`
 
 ```lua
 local done =    "done" or 
@@ -17,7 +17,9 @@ local done =    "done" or
                 "missingFunds" or
                 "missingDataTable" or
                 "alreadyMain" or
-                ""
+                "unknownAction" or
+                "notEnoughCash" or
+                "xplayerError"
 
 
 -- "done" is the only success
