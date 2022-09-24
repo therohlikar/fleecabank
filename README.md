@@ -1,9 +1,29 @@
 # FLEECABANK
 
+```lua
+local done =    "done" or 
+                "notEnough" or 
+                "missingAccount" or 
+                "notEmpty" or 
+                "negativeValue" or
+                "missingVariable" or
+                "sameAccount" or
+                "missingSourceAccount" or
+                "missingTargetAccount" or
+                "missingFunds" or
+                "missingDataTable" or
+                "alreadyMain"
+
+
+-- "done" is the only success
+```
+
+
+
 ## SERVER SIDE EXPORTS
 
 | doesAccountExist (sourceAccount [int]) |
-| -------------------------------------- |
+|:-------------------------------------- |
 | returns true or false                  |
 
 *example:*
@@ -17,7 +37,7 @@ end
 ```
 
 | getMainAccountByOwner (ownerId [identifier]) |
-| -------------------------------------------- |
+|:-------------------------------------------- |
 | returns account selected as main [table]     |
 
 *example:*
@@ -35,7 +55,7 @@ end
 ```
 
 | getAccountsByOwner (ownerId [identifier])                 |
-| --------------------------------------------------------- |
+|:--------------------------------------------------------- |
 | returns count of accounts [int], list of accounts [table] |
 
 *example:*
@@ -56,7 +76,7 @@ end
 ```
 
 | getAccountByNumber (sourceAccount [int]) |
-| ---------------------------------------- |
+|:---------------------------------------- |
 | returns account [table]                  |
 
 *example:*
@@ -69,7 +89,7 @@ end
 ```
 
 | isBankAccountOwner (sourceAccount [int], ownerId [identifier]) |
-| -------------------------------------------------------------- |
+|:-------------------------------------------------------------- |
 | returns true or false                                          |
 
 *example:*
@@ -87,7 +107,7 @@ end
 ```
 
 | create (owner[identifier], balance [int], number [int], data [table], main [boolean])          |
-| ---------------------------------------------------------------------------------------------- |
+|:---------------------------------------------------------------------------------------------- |
 | max available accounts to create per person changeable in *Config.maxAvailableAccounts*        |
 | the "number" parameter is only a beginning and from that number is generated an account number |
 | <u>all </u>parameters except for owner can be <u>nil</u>                                       |
@@ -97,7 +117,7 @@ end
 *parameter data example:*
 
 ```lua
-data = 
+data = { 
     account_name = "STRING",
     account_created = os.time(),
     any_other_specific_and_unique_variable = nil
@@ -125,7 +145,7 @@ end
 ```
 
 | delete (sourceAccount [int])                                                                                |
-| ----------------------------------------------------------------------------------------------------------- |
+|:----------------------------------------------------------------------------------------------------------- |
 | not possible if there is any amount on the account - changeable in *Config.enableDeleteNotEmptyBankAccount* |
 | returns status done [string]                                                                                |
 
@@ -144,12 +164,22 @@ print("DELETED?", done)
 
 *example:*
 
+```lua
+local done = checkFunds(123456, 1000, true, true)
+print("HAS ENOUGH?", done, "THEN REMOVE THE FUNDS")
+```
+
 | **removeFunds (sourceAccount [int], value [int], save [boolean])**                  |
 | ----------------------------------------------------------------------------------- |
 | if <u>save</u> is set on true, the execution will be saved into database right away |
 | returns status done [string]                                                        |
 
 *example:*
+
+```lua
+local done = removeFunds(123456, 1000, true)
+print("REMOVED FUNDS?", done)
+```
 
 | **addFunds (sourceAccount [int], value [int], save [boolean])**                     |
 | ----------------------------------------------------------------------------------- |
@@ -158,12 +188,36 @@ print("DELETED?", done)
 
 *example:*
 
-| **transferFunds (sourceAccount [int], targetAccount [int], value [int], save [boolean])** |
-| ----------------------------------------------------------------------------------------- |
-| if <u>save</u> is set on true, the execution will be saved into database right away       |
-| returns status done [string]                                                              |
+```lua
+local done = addFunds(123456, 1000, true)
+print("ADDED FUNDS?", done)
+```
+
+| transferFunds (sourceAccount [int], targetAccount [int], value [int], save [boolean]) |
+| ------------------------------------------------------------------------------------- |
+| if <u>save</u> is set on true, the execution will be saved into database right away   |
+| returns status done [string]                                                          |
 
 *example:*
+
+```lua
+-- ESX
+local xPlayer = ESX.GetPlayerFromId(client)
+local tPlayer = ESX.GetPlayerFromId(target)
+if xPlayer and tPlayer then 
+    local sourceChar = xPlayer.char
+    local targetChar = tPlayer.char
+    if sourceChar and targetChar then 
+        local sourceMain = getMainAccountByOwner(sourceChar)
+        local targetMain = getMainAccountByOwner(targetChar)
+        if sourceMain and targetMain then 
+            local done = transferFunds(sourceMain, targetMain, 1000, true)
+            print("SUCCESS?", done)
+        end
+    end
+end
+
+```
 
 | **updateAccountData (sourceAccount [int], variable [string], value [?])** |
 | ------------------------------------------------------------------------- |
@@ -172,37 +226,41 @@ print("DELETED?", done)
 
 *example:*
 
+```lua
+local done = updateAccountData(123456, "account_name", "MY NEW ACCOUNT NAME")
+print("CHANGED ACCOUNT VARIABLE", done)
+```
 
 
 
+## SERVER SIDE EXPORTS
 
-| CLIENT SIDE EXPORTS |
-| ------------------- |
+| **openPaymentMethod(data [table], success [func], failure [func])**                        |
+| ------------------------------------------------------------------------------------------ |
+| in the end of events it will execute either "success" or "failure" depending on the result |
 
-> **openPaymentMethod(data [table], success [func], failure [func])**
-> 
-> data = {
-> 
->     title = "CHANGEME",
-> 
->     amount = 0,
-> 
-> }
-> 
-> in the end of events it will execute either "success" or "failure" depending on the result
-> 
-> ```lua
-> openPaymentMethod({
->         amount = 500,
->         title = "ŠKOLKA PRO VOJTÍKA"
->     },
->     function()
->         print("SUCCESS")
->     end,
->     function()
->         print("FAILURE")
->     end)
-> 
-> ```
+*parameter data example:*
+
+```lua
+data = {
+    title = "TITLE OF THE MENU",
+    amount = 0
+}
+```
+
+*example:*
+
+```lua
+openPaymentMethod({
+        amount = 500,
+        title = "ŠKOLKA PRO VOJTÍKA"
+    },
+    function()
+        print("SUCCESS")
+    end,
+    function()
+        print("FAILURE")
+    end)
+```
 
 `© rozkothe, 2022`
