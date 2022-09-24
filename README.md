@@ -1,12 +1,8 @@
 # FLEECABANK
 
-[SERVER SIDE EXPORTS](## SERVER SIDE EXPORTS)
-
-[CLIENT SIDE EXPORTS](## CLIENT SIDE EXPORTS)
-
-[doesAccountExist](# doesAccountExist)
 
 
+`every return of exported function`
 
 ```lua
 local done =    "done" or 
@@ -20,7 +16,8 @@ local done =    "done" or
                 "missingTargetAccount" or
                 "missingFunds" or
                 "missingDataTable" or
-                "alreadyMain"
+                "alreadyMain" or
+                ""
 
 
 -- "done" is the only success
