@@ -435,10 +435,6 @@ function setupBankAccounts() {
         $('#bankAccountsListRows').prepend(`<div class="col-12 col-sm-6 bankAccountSingle">
             <div class="account-card account-card-primary text-white rounded mb-4 mb-lg-0">
               <div class="row no-gutters">
-                <div class="col-3 d-flex justify-content-center p-3">
-                  <div class="my-auto text-center"> <span class="text-13"><i class="fas fa-university"></i></span>
-                  </div>
-                </div>
                 <div class="col-9 border-left">
                   <div class="py-4 my-2 pl-4">
                     <p class="text-4 font-weight-500 mb-1">${accountNumber}</p>
