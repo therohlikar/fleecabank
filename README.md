@@ -29,9 +29,9 @@ local done =    "done" or
 
 ## SERVER SIDE EXPORTS
 
-| #doesAccountExist (sourceAccount [int]) |
-|:--------------------------------------- |
-| returns true or false                   |
+| doesAccountExist (sourceAccount [int]) |
+|:---------------------------------------|
+| returns true or false                  |
 
 *example:*
 
@@ -240,7 +240,7 @@ print("CHANGED ACCOUNT VARIABLE", done)
 
 
 
-## SERVER SIDE EXPORTS
+## LOCAL SIDE EXPORTS
 
 | **openPaymentMethod(data [table], success [func], failure [func])**                        |
 |:------------------------------------------------------------------------------------------ |

@@ -271,7 +271,7 @@ function isBankAccountOwner(sourceAccount, ownerId)
 
     return (accounts[sourceAccount].owner == ownerId)
 end
-function create(owner, balance, number, data, main)
+function create(owner, balance, data, main)
     if owner == nil then
         return "missingVariables"
     end
@@ -280,26 +280,12 @@ function create(owner, balance, number, data, main)
         balance = 0
     end
 
-    local try = 0
-
-    if number == nil then
-        number = os.time()
-    end
-
-    number = generateAccountNumber(tostring(number))
-    while accounts[number] ~= nil do
-        number = generateAccountNumber(tostring(number))
-        Citizen.Wait(50)
-        try = try + 1
-
-        if try > 20 then
-            return "looped"
-        end
-    end
+    local number = generateAccountNumber(tostring(number))
 
     if data == nil then
         data = {
             account_name = "CHANGE ME",
+            account_description = "JUST AN ACCOUNT",
             account_created = os.time()
         }
     end
@@ -330,17 +316,13 @@ function create(owner, balance, number, data, main)
 
     return "done", accounts[number]
 end
-function generateAccountNumber(part1)
-    local creatednumber = part1.sub(part1, 1, 2)
-    local length = 6 - creatednumber.len(creatednumber)
-
-    while length > 0 do
-        local randomnumber = tostring(math.random(10, 99))
-        creatednumber = creatednumber .. randomnumber
-        length = length - randomnumber.len(randomnumber)
+function generateAccountNumber()
+    while true do
+        local generatedNumber = tostring(math.random(1000000000, 9999999999))
+        if accounts[generatedNumber] == nil then
+            return generatedNumber
+        end
     end
-
-    return tonumber(creatednumber)
 end
 function delete(sourceAccount)
     if accounts[sourceAccount] == nil then
